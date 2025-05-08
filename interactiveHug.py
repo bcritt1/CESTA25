@@ -1,46 +1,20 @@
 import os
-from transformers import AutoTokenizer, AutoModel
+import pickle
+import re
 import torch
+from sentence_transformers import util, SentenceTransformer
 
-# Load pre-trained model and tokenizer
-model_name = "bert-base-uncased"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModel.from_pretrained(model_name)
+# Load pre-trained model
+model_name = "sentence-transformers/all-MiniLM-L6-v2"
+model = SentenceTransformer(model_name)
 
-# Path to directory containing text files
-directory_path = '/farmshare/learning/data/emerson'
-
-# Function to get embeddings for a word
-def get_word_embedding(word):
-    inputs = tokenizer(word, return_tensors="pt")
-    outputs = model(**inputs)
-    last_hidden_states = outputs.last_hidden_state
-    return last_hidden_states.mean(dim=1).squeeze()
-
-# Function to read and process text files
-def process_text_files(directory_path):
-    word_embeddings = {}
-    
-    for filename in os.listdir(directory_path):
-        if filename.endswith('.txt'):
-            file_path = os.path.join(directory_path, filename)
-            with open(file_path, 'r', encoding='utf-8') as file:
-                text = file.read()
-                
-                # Tokenize the text and get unique words
-                words = list(set(tokenizer.tokenize(text)))
-                
-                # Get embeddings for all words
-                for word in words:
-                    if word not in word_embeddings:
-                        word_embeddings[word] = get_word_embedding(word)
-    
-    return word_embeddings
+# Define paths
+embeddings_dir = f'/scratch/users/{os.environ["USER"]}/embeddings'
+embedding_file = os.path.join(embeddings_dir, 'emerson_word_embeddings.pkl')
 
 # Function to calculate cosine similarity
 def cosine_similarity(embedding1, embedding2):
-    cos = torch.nn.CosineSimilarity(dim=0)
-    return cos(embedding1, embedding2).item()
+    return util.pytorch_cos_sim(embedding1, embedding2).item()
 
 # Function to find and rank closest words
 def find_closest_words(word_embeddings, target_word, n=5):
@@ -63,36 +37,53 @@ def words_between(word_embeddings, word1, word2):
     closest_words = sorted(similarities.items(), key=lambda item: item[1], reverse=True)
     return closest_words
 
-# Process text files and get word embeddings
-word_embeddings = process_text_files(directory_path)
+# Load word embeddings from file
+with open(embedding_file, 'rb') as f:
+    word_embeddings = pickle.load(f)
 
 while True:
     print("\nSelect Mode:")
     print("1. Most similar to target word")
     print("2. N most similar to target word")
     print("3. Words between two words")
-    print("4. Exit")
-    choice = input("Enter your choice (1, 2, 3, 4): ").strip()
+    print("4. View embedding vector")
+    print("5. Exit")
+    choice = input("Enter your choice (1, 2, 3, 4, 5): ").strip()
 
-    if choice == '4':
+    if choice == '5':
         break
     elif choice == '1':
-        target_word = input("Enter the target word: ").strip()
-        closest_word = find_closest_words(word_embeddings, target_word, n=1)
-        print(f"Most similar word to '{target_word}': {closest_word[0][0]} (Similarity: {closest_word[0][1]:.4f})")
+        target_word = input("Enter the target word: ").strip().lower()
+        try:
+            closest_word = find_closest_words(word_embeddings, target_word, n=1)
+            print(f"Most similar word to '{target_word}': {closest_word[0][0]} (Similarity: {closest_word[0][1]:.4f})")
+        except ValueError as e:
+            print(e)
     elif choice == '2':
-        target_word = input("Enter the target word: ").strip()
+        target_word = input("Enter the target word: ").strip().lower()
         n = int(input("Enter the number of similar words (N): ").strip())
-        closest_words = find_closest_words(word_embeddings, target_word, n=n)
-        print(f"{n} most similar words to '{target_word}':")
-        for word, similarity in closest_words:
-            print(f"{word}: {similarity:.4f}")
+        try:
+            closest_words = find_closest_words(word_embeddings, target_word, n=n)
+            print(f"{n} most similar words to '{target_word}':")
+            for word, similarity in closest_words:
+                print(f"{word}: {similarity:.4f}")
+        except ValueError as e:
+            print(e)
     elif choice == '3':
-        word1 = input("Enter the first word: ").strip()
-        word2 = input("Enter the second word: ").strip()
-        words_between_list = words_between(word_embeddings, word1, word2)
-        print(f"Words between '{word1}' and '{word2}':")
-        for word, similarity in words_between_list:
-            print(f"{word}: {similarity:.4f}")
+        word1 = input("Enter the first word: ").strip().lower()
+        word2 = input("Enter the second word: ").strip().lower()
+        try:
+            words_between_list = words_between(word_embeddings, word1, word2)
+            print(f"Words between '{word1}' and '{word2}':")
+            for word, similarity in words_between_list:
+                print(f"{word}: {similarity:.4f}")
+        except ValueError as e:
+            print(e)
+    elif choice == '4':
+        target_word = input("Enter the word to view its embedding: ").strip().lower()
+        if target_word in word_embeddings:
+            print(f"Embedding vector for '{target_word}': {word_embeddings[target_word]}")
+        else:
+            print(f"'{target_word}' not found in word embeddings.")
     else:
         print("Invalid choice. Please try again.")
