@@ -29,6 +29,8 @@
 
 All our systems are remote, so you'll need some way to connect to them. One way we won't talk about a ton today is Farmshare's [Open OnDemand] (https://ondemand.farmshare.stanford.edu/), which allows you to use IDEs like RStudio or JupyterLabs with our compute on the back-end. This has a good chance of being the best fit for your research workflow, but it doesn't really give us a good idea of what's happening "under the hood," so we're not going to look at it much today.
 
+![hpc](images/hpc.jpg)
+
 If you're not using OnDemand, the primary way of connecting to a remote computer is a tool/protocol called `ssh`, which stands for Secure Shell Protocol. Windows folks, open _Powershell_, Mac/Linux folks, open _Terminal_ and type: 
 
 ```ssh SUNetID@login.farmshare.stanford.edu```
