@@ -23,11 +23,11 @@
 
 ### Veni
 
-[Stanford Research Computing] (https://srcc.stanford.edu/support/gettingstarted-hpc) has several free(!) systems available to researchers, including a whole partition for H&S researchers. Depending on your data/project, you may need to use one system over another; most people use the primary research cluster, _Sherlock_. Today, we're going to use the learning cluster, _Farmshare_ because you need to be sponsored by a PI to use Sherlock and anyone with a SUNet ID can use Farmshare.
+[Stanford Research Computing](https://srcc.stanford.edu/support/gettingstarted-hpc) has several free(!) systems available to researchers, including a whole partition for H&S researchers. Depending on your data/project, you may need to use one system over another; most people use the primary research cluster, _Sherlock_. Today, we're going to use the learning cluster, _Farmshare_ because you need to be sponsored by a PI to use Sherlock and anyone with a SUNet ID can use Farmshare.
 
 #### But how do you do that?
 
-All our systems are remote, so you'll need some way to connect to them. One way we won't talk about a ton today is Farmshare's [Open OnDemand] (https://ondemand.farmshare.stanford.edu/), which allows you to use IDEs like RStudio or JupyterLabs with our compute on the back-end. This has a good chance of being the best fit for your research workflow, but it doesn't really give us a good idea of what's happening "under the hood," so we're not going to look at it much today.
+All our systems are remote, so you'll need some way to connect to them. One way we won't talk about a ton today is Farmshare's [Open OnDemand](https://ondemand.farmshare.stanford.edu/), which allows you to use IDEs like RStudio or JupyterLabs with our compute on the back-end. This has a good chance of being the best fit for your research workflow, but it doesn't really give us a good idea of what's happening "under the hood," so we're not going to look at it much today.
 
 ![hpc](images/hpc.jpg)
 
