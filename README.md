@@ -131,6 +131,8 @@ So how do we make a request? This is done in an **sbatch script**, which is basi
 
 ### Sbatch Script
 
+Below is a notated version of our sbatch script, batchHug.sbatch. It's pretty simple for clarity's sake, but you can find a great cheatsheet for slurm commands ![here](https://slurm.schedmd.com/pdfs/summary.pdf)
+
 ```bash
 #!/bin/bash
 #SBATCH --job-name=word_embeddings                           #Arbitrary job name
@@ -146,7 +148,13 @@ module load python/3.12  #Load Python
 python3 /farmshare/learning/CESTA25/batchHug.py #Run script
 ```
 
-This will submit ```batchHug.py``` to a job queue where it will be processed in an order determined by Slurm (primarily by resources requested for this job and resources you've requested recently). You can monitor your job in queue with
+We can submit the sbatch script with
+
+```bash
+sbatch batchHug.sbatch
+```
+
+This send it to a job queue where it will be processed in an order determined by Slurm (primarily by resources requested for this job and resources you've requested recently). You can monitor your job in queue with
 
 ```bash
 watch squeue --me
